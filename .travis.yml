@@ -1,13 +1,11 @@
 language: go
-
 go:
-  - 1.9
-
-branches:
-  only:
-    - travis
-
-install: true
-
+- 1.9
+install:
+- apt-get update && apt-get install xz-utils
+- curl -LO https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
+- tar -xf upx-3.94-amd64_linux.tar.xz
+- mv upx-3.94-amd64_linux/upx /usr/local/bin/
 script:
-  - go build
+- go build -ldflags "-w -s -extldflags '-static' -X main.versionString=test" -o go-init
+- upx --brute go-init
