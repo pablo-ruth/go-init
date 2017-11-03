@@ -8,6 +8,10 @@ It is designed to run as the first process (PID 1) inside a container.
 
 It is lightweight (less than 500KB after UPX compression) and statically linked so you don't need to install any dependency.
 
+## Download
+
+You can download the latest version on [releases page](https://github.com/pablo-ruth/go-init/releases)
+
 ## Why you need an init system
 
 I can't explain it better than Yelp in *dumb-init* repo, so please [read their explanation](https://github.com/Yelp/dumb-init/blob/v1.2.0/README.md#why-you-need-an-init-system)
