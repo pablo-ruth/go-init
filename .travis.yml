@@ -1,0 +1,11 @@
+language: go
+
+go:
+  - 1.9
+
+branches:
+  only:
+		- travis
+
+script:
+	- go build
