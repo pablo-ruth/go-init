@@ -5,7 +5,7 @@ go:
 
 branches:
   only:
-		- travis
+    - travis
 
 script:
-	- go build
+  - go build
