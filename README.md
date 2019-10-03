@@ -1,7 +1,5 @@
 # go-init
 
-[![Build Status](https://travis-ci.org/pablo-ruth/go-init.svg?branch=master)](https://travis-ci.org/pablo-ruth/go-init)
-
 **go-init** is a minimal init system with simple *lifecycle management* heavily inspired by [dumb-init](https://github.com/Yelp/dumb-init).
 
 It is designed to run as the first process (PID 1) inside a container.
