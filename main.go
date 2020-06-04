@@ -50,26 +50,20 @@ func main() {
 		log.Println("[go-init] No pre-start command defined, skip")
 	} else {
 		log.Printf("[go-init] Pre-start command launched : %s\n", preStartCmd)
-		err := run(preStartCmd)
+		err, exitCode := run(preStartCmd)
+		log.Printf("[go-init] Pre-start command exited with code %d", exitCode)
 		if err != nil {
-			log.Println("[go-init] Pre-start command failed")
 			log.Printf("[go-init] %s\n", err)
-			cleanQuit(cancel, &wg, 1)
-		} else {
-			log.Printf("[go-init] Pre-start command exited")
+			cleanQuit(cancel, &wg, exitCode)
 		}
 	}
 
 	// Launch main command
-	var mainRC int
 	log.Printf("[go-init] Main command launched : %s\n", mainCmd)
-	err := run(mainCmd)
+	err, exitCode := run(mainCmd)
+	log.Printf("[go-init] Main command exited with code %d", exitCode)
 	if err != nil {
-		log.Println("[go-init] Main command failed")
 		log.Printf("[go-init] %s\n", err)
-		mainRC = 1
-	} else {
-		log.Printf("[go-init] Main command exited")
 	}
 
 	// Launch post-stop command
@@ -77,18 +71,16 @@ func main() {
 		log.Println("[go-init] No post-stop command defined, skip")
 	} else {
 		log.Printf("[go-init] Post-stop command launched : %s\n", postStopCmd)
-		err := run(postStopCmd)
+		err, exitCode := run(postStopCmd)
+		log.Printf("[go-init] Post-stop command exited with code %d", exitCode)
 		if err != nil {
-			log.Println("[go-init] Post-stop command failed")
 			log.Printf("[go-init] %s\n", err)
-			cleanQuit(cancel, &wg, 1)
-		} else {
-			log.Printf("[go-init] Post-stop command exited")
+			cleanQuit(cancel, &wg, exitCode)
 		}
 	}
 
 	// Wait removeZombies goroutine
-	cleanQuit(cancel, &wg, mainRC)
+	cleanQuit(cancel, &wg, exitCode)
 }
 
 func removeZombies(ctx context.Context, wg *sync.WaitGroup) {
@@ -122,10 +114,11 @@ func removeZombies(ctx context.Context, wg *sync.WaitGroup) {
 	}
 }
 
-func run(command string) error {
+func run(command string) (error, int) {
 
 	var commandStr string
 	var argsSlice []string
+	var exitCode int
 
 	// Split cmd and args
 	commandSlice := strings.Fields(command)
@@ -166,16 +159,24 @@ func run(command string) error {
 	// Start defined command
 	err := cmd.Start()
 	if err != nil {
-		return err
+		exitCode = -1
+		return err, exitCode
 	}
 
 	// Wait for command to exit
 	err = cmd.Wait()
 	if err != nil {
-		return err
+		exitCode = -1
+		if exiterr, ok := err.(*exec.ExitError); ok {
+			// The program has exited with an exit code != 0
+			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
+				exitCode = status.ExitStatus()
+			}
+		}
+		return err, exitCode
 	}
 
-	return nil
+	return nil, exitCode
 }
 
 func cleanQuit(cancel context.CancelFunc, wg *sync.WaitGroup, code int) {
