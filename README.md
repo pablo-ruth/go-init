@@ -1,5 +1,7 @@
 # go-init
 
+⚠️ **Note: This repository is no longer maintained. A maintained fork is available at [https://github.com/adambkaplan/go-init](https://github.com/adambkaplan/go-init).**
+
 [![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
 [![Build Status](https://travis-ci.org/pablo-ruth/go-init.svg?branch=master)](https://travis-ci.org/pablo-ruth/go-init)
 
